@@ -1,41 +1,44 @@
-📚 Полное руководство по Simple Telegram Bot Library
-📦 Установка и настройка
-1. Создание бота в Telegram
-Откройте @BotFather
+🤖 Создание бота
+
+
+Откройте @BotFather в Telegram
 
 Выполните команды:
 
-bash
+text
 /newbot
-→ MyTestBot (имя бота)
-→ my_test_bot (username, должен заканчиваться на _bot)
+→ Укажите имя бота (например: MyCoolBot)
+→ Укажите username (должен оканчиваться на _bot)
 Сохраните полученный токен (формат: 123456:ABC-DEF1234ghIkl-zyx57W2v1u123ew11)
 
-2. Установка библиотеки
+💻 Установка
 bash
 # Создаем папку проекта
-mkdir my-bot && cd my-bot
+mkdir my-telegram-bot && cd my-telegram-bot
 
-# Инициализируем Composer (если еще не установлен)
-php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
-php composer-setup.php
-php -r "unlink('composer-setup.php');"
+# Инициализируем Composer
+composer init --name="myproject/bot" --type="project" --require="php": "^8.1" --no-interaction
 
 # Устанавливаем библиотеку
 composer require creatorqwerty/simple-telegram-bot
-3. Настройка окружения
+
+# Устанавливаем dotenv для работы с .env
+composer require vlucas/phpdotenv
+🚀 Быстрый старт
 Создайте файл .env:
 
 bash
 echo "TELEGRAM_BOT_TOKEN=ваш_токен" > .env
 echo ".env" >> .gitignore
-🚀 Базовое использование
-1. Пример бота (bot.php)
+Создайте файл bot.php:
+
 php
 <?php
 require __DIR__ . '/vendor/autoload.php';
 
 use CreatorQwerty\SimpleTelegramBot\TelegramBot;
+
+
 
 // Загрузка .env
 $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);
@@ -44,19 +47,24 @@ $dotenv->load();
 try {
     $bot = new TelegramBot($_ENV['TELEGRAM_BOT_TOKEN']);
     
-    // Получаем Chat ID автоматически
+    // Получаем последние сообщения
     $updates = $bot->getUpdates();
-    if (empty($updates)) {
-        die("Напишите боту любое сообщение!");
+    
+    if (!empty($updates)) {
+        $chatId = $updates[0]['message']['chat']['id'];
+        $bot->sendMessage($chatId, "Привет! Я работаю!");
+    } else {
+        echo "Напишите боту сообщение, чтобы получить chat_id";
     }
-    
-    $chatId = $updates[0]['message']['chat']['id'];
-    $response = $bot->sendMessage($chatId, "Привет! Я работаю!");
-    
-    print_r($response);
 } catch (Exception $e) {
     die("Ошибка: " . $e->getMessage());
 }
-2. Запуск бота
+
+
+
+Запустите бота:
+
+
+
 bash
 php bot.php
